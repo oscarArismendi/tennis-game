@@ -20,6 +20,11 @@ class TennisScoreFormatAdapterTest {
             return null
         }
 
+        override fun updateGameById(updateColumns: String, gameId: Long): Boolean {
+            // NOT IMPLEMENTED FOR TESTING PURPOSES
+            return false
+        }
+
         override fun findGameByPlayersIds(player1Id: Long, player2Id: Long): Game? {
             return Game(
                 id = 1,
@@ -38,6 +43,12 @@ class TennisScoreFormatAdapterTest {
             // NOT IMPLEMENTED FOR TESTING PURPOSES
             return null
         }
+
+        override fun updateGameById(updateColumns: String, gameId: Long): Boolean {
+            // NOT IMPLEMENTED FOR TESTING PURPOSES
+            return false
+        }
+
         override fun findGameByPlayersIds(player1Id: Long, player2Id: Long): Game? {
             return Game(
                 id = 1,
@@ -56,6 +67,12 @@ class TennisScoreFormatAdapterTest {
             // NOT IMPLEMENTED FOR TESTING PURPOSES
             return null
         }
+
+        override fun updateGameById(updateColumns: String, gameId: Long): Boolean {
+            // NOT IMPLEMENTED FOR TESTING PURPOSES
+            return false
+        }
+
         override fun findGameByPlayersIds(player1Id: Long, player2Id: Long): Game? {
             return Game(
                 id = 1,
@@ -74,6 +91,12 @@ class TennisScoreFormatAdapterTest {
             // NOT IMPLEMENTED FOR TESTING PURPOSES
             return null
         }
+
+        override fun updateGameById(updateColumns: String, gameId: Long): Boolean {
+            // NOT IMPLEMENTED FOR TESTING PURPOSES
+            return false
+        }
+
         override fun findGameByPlayersIds(player1Id: Long, player2Id: Long): Game?{
             return Game(
                 id = 1,

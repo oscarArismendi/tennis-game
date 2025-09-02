@@ -81,4 +81,26 @@ class MySQLGameRepository: GamePort {
         }
         return null
     }
+
+    override fun updateGameById(updateColumns: String, gameId: Long): Boolean {
+        val sql = "UPDATE game SET $updateColumns WHERE id = ?"
+        try {
+
+            val dbConfig = DatabaseConfig()
+            dbConfig.getConnection().use { connection ->
+                connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS).use { statement ->
+                    statement.setLong(1, gameId)
+
+                    val rowsUpdated = statement.executeUpdate()
+
+                    if (rowsUpdated > 0){
+                        return true
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            println("Error at updating a game: " + e.message)
+        }
+        return false
+    }
 }

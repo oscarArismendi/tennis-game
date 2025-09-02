@@ -46,7 +46,7 @@ class TennisScoreFormatAdapter: TennisScoreFormatPort {
                     Advantage.AD_OUT ->  "Winner ${receiverPlayer.firstname} ${receiverPlayer.lastname}"
                     Advantage.NONE ->  "Game ended without a winner"
                 }
-            }else if(game.serverScore == 40 && game.state == GameState.IN_PROGRESS){
+            }else if(game.serverScore == 40 && game.state != GameState.ENDED){
                 when(game.advantage){
                     Advantage.AD_IN -> "Advantage ${serverPlayer.firstname} ${serverPlayer.lastname}"
                     Advantage.AD_OUT -> "Advantage ${receiverPlayer.firstname} ${receiverPlayer.lastname}"
@@ -61,8 +61,7 @@ class TennisScoreFormatAdapter: TennisScoreFormatPort {
                 }
             }
         }else{
-            "${game.serverScore}-${game.receiverScore}"
+            return "${game.serverScore}-${game.receiverScore}"
         }
-        return "Couldn't format ${game.serverScore}-${game.receiverScore} with advantage ${game.advantage} and state ${game.state}"
     }
 }

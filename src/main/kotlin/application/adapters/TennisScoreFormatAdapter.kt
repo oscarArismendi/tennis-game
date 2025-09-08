@@ -3,6 +3,7 @@ package application.adapters
 import application.ports.`in`.TennisScoreFormatPort
 import application.ports.out.GamePort
 import application.ports.out.PlayerPort
+import application.support.ScoreLookUpError
 import domain.dtos.GameRequest
 import domain.dtos.GameScoreResponse
 import domain.models.Advantage
@@ -19,20 +20,27 @@ class TennisScoreFormatAdapter: TennisScoreFormatPort {
         try {
             val player1 = playerRepository.findPlayerByEmail(gameRequest.serverEmail)
             if(player1 == null){
-                throw Exception("Player with email ${gameRequest.serverEmail} not found")
+                throw ScoreLookUpError.PlayerNotFound(gameRequest.serverEmail)
             }
             val player2 = playerRepository.findPlayerByEmail(gameRequest.receiverEmail)
             if(player2 == null){
-                throw Exception("Player with email ${gameRequest.receiverEmail} not found")
+                throw ScoreLookUpError.PlayerNotFound(gameRequest.receiverEmail)
             }
             val game =gameRepository.findGameByPlayersIds(player1.id,player2.id)
             if(game == null){
-                throw Exception("Game not found for players with emails  ${player1.email} and ${player2.email}")
+                throw ScoreLookUpError.GameNotFound(player1.email,player2.email)
             }
             val formattedScore = formatScore(player1,player2,game)
             return GameScoreResponse(game.serverScore, game.receiverScore,formattedScore)
-        }catch (e: Exception) {
-            println("Error at formatting the score: " + e.message)
+        }catch (e: ScoreLookUpError) {
+            when (e) {
+                is ScoreLookUpError.PlayerNotFound -> {
+                    println("Player not found: ${e.message}")
+                }
+                is ScoreLookUpError.GameNotFound -> {
+                    println("Game not found: ${e.message}")
+                }
+            }
         }
 
         return null

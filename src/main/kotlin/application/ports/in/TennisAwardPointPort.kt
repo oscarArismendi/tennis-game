@@ -1,9 +1,9 @@
-package org.example.application.ports.`in`
+package application.ports.`in`
 
-import org.example.application.ports.out.GamePort
-import org.example.application.ports.out.PlayerPort
-import org.example.domain.dtos.GameRequest
-import org.example.domain.models.Game
+import application.ports.out.GamePort
+import application.ports.out.PlayerPort
+import domain.dtos.GameRequest
+import domain.models.Game
 
 interface TennisAwardPointPort {
     fun awardTennisPoint(gameRequest: GameRequest, gameRepository: GamePort, playerRepository: PlayerPort, toServer: Boolean): Game?

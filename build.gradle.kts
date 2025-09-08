@@ -3,7 +3,7 @@ plugins {
     application
 }
 
-group = "org.example"
+group = "tennis.game"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -26,5 +26,5 @@ kotlin {
 }
 
 application {
-    mainClass.set("org.example.MainKt")
+    mainClass.set("MainKt")
 }

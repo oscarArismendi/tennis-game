@@ -1,8 +1,8 @@
-package org.example.infrastructure
+package infrastructure
 
-import org.example.application.ports.out.PlayerPort
-import org.example.domain.models.Player
-import org.example.config.DatabaseConfig
+import application.ports.out.PlayerPort
+import domain.models.Player
+import config.DatabaseConfig
 import java.sql.PreparedStatement
 import java.sql.SQLException
 

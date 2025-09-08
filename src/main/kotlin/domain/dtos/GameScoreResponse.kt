@@ -1,3 +1,3 @@
-package org.example.domain.dtos
+package domain.dtos
 
 class GameScoreResponse(val serverScore: Int, val receiverScore: Int,val formatScore:String)

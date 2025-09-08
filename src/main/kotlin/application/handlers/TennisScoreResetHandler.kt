@@ -1,12 +1,10 @@
-package org.example.application.handlers
+package application.handlers
 
-import org.example.application.ports.`in`.TennisScoreFormatPort
-import org.example.application.ports.`in`.TennisScoreResetPort
-import org.example.application.ports.out.GamePort
-import org.example.application.ports.out.PlayerPort
-import org.example.domain.dtos.GameRequest
-import org.example.domain.dtos.GameScoreResponse
-import org.example.domain.models.Game
+import application.ports.`in`.TennisScoreResetPort
+import application.ports.out.GamePort
+import application.ports.out.PlayerPort
+import domain.dtos.GameRequest
+import domain.models.Game
 
 class TennisScoreResetHandler(val tennisScoreResetService: TennisScoreResetPort,
                               val gameRepository: GamePort,

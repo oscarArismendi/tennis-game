@@ -1,6 +1,6 @@
-package org.example.application.ports.out
+package application.ports.out
 
-import org.example.domain.models.Game
+import domain.models.Game
 
 interface GamePort {
     fun findGameByPlayersIds(player1Id: Long, player2Id:Long): Game?

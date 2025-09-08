@@ -71,7 +71,7 @@ cd /path/to/tennis-game  # Not /path/to/tennis-game/src
 ./gradlew run
 ```
 
-This command will compile the code if needed and run the main class (org.example.MainKt).
+This command will compile the code if needed and run the main class (MainKt).
 
 ## How to Run Tests
 

@@ -1,4 +1,4 @@
-package org.example.domain.models
+package domain.models
 
 data class Player (
     var id: Long,

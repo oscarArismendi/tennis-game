@@ -1,14 +1,14 @@
-package org.example.application.adapters
+package application.adapters
 
-import org.example.application.ports.`in`.TennisScoreFormatPort
-import org.example.application.ports.out.GamePort
-import org.example.application.ports.out.PlayerPort
-import org.example.domain.dtos.GameRequest
-import org.example.domain.dtos.GameScoreResponse
-import org.example.domain.models.Advantage
-import org.example.domain.models.Game
-import org.example.domain.models.GameState
-import org.example.domain.models.Player
+import application.ports.`in`.TennisScoreFormatPort
+import application.ports.out.GamePort
+import application.ports.out.PlayerPort
+import domain.dtos.GameRequest
+import domain.dtos.GameScoreResponse
+import domain.models.Advantage
+import domain.models.Game
+import domain.models.GameState
+import domain.models.Player
 
 class TennisScoreFormatAdapter: TennisScoreFormatPort {
     override fun getFormattedScore(

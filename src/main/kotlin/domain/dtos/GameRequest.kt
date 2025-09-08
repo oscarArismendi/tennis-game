@@ -1,3 +1,3 @@
-package org.example.domain.dtos
+package domain.dtos
 
 class GameRequest(val serverEmail: String, val receiverEmail: String)

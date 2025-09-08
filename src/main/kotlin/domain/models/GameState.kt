@@ -1,4 +1,4 @@
-package org.example.domain.models
+package domain.models
 
 enum class GameState(val message: String) {
     NOT_STARTED("Not Started"),

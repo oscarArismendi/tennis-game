@@ -1,10 +1,10 @@
-package org.example.application.handlers
+package application.handlers
 
-import org.example.application.ports.`in`.TennisAwardPointPort
-import org.example.application.ports.out.GamePort
-import org.example.application.ports.out.PlayerPort
-import org.example.domain.dtos.GameRequest
-import org.example.domain.models.Game
+import application.ports.`in`.TennisAwardPointPort
+import application.ports.out.GamePort
+import application.ports.out.PlayerPort
+import domain.dtos.GameRequest
+import domain.models.Game
 
 class TennisAwardPointHandler (val tennisAwardPointService: TennisAwardPointPort,
                                val gameRepository: GamePort,

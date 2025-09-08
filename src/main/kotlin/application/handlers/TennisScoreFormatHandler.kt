@@ -1,10 +1,10 @@
-package org.example.application.handlers
+package application.handlers
 
-import org.example.application.ports.`in`.TennisScoreFormatPort
-import org.example.application.ports.out.GamePort
-import org.example.application.ports.out.PlayerPort
-import org.example.domain.dtos.GameRequest
-import org.example.domain.dtos.GameScoreResponse
+import application.ports.`in`.TennisScoreFormatPort
+import application.ports.out.GamePort
+import application.ports.out.PlayerPort
+import domain.dtos.GameRequest
+import domain.dtos.GameScoreResponse
 
 class TennisScoreFormatHandler(val tennisScoreFormatService: TennisScoreFormatPort,
                                val gameRepository: GamePort,

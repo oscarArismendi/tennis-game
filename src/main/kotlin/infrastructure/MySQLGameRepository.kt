@@ -1,10 +1,10 @@
-package org.example.infrastructure
+package infrastructure
 
-import org.example.application.ports.out.GamePort
-import org.example.domain.models.Advantage
-import org.example.domain.models.Game
-import org.example.domain.models.GameState
-import org.example.config.DatabaseConfig
+import application.ports.out.GamePort
+import domain.models.Advantage
+import domain.models.Game
+import domain.models.GameState
+import config.DatabaseConfig
 import java.sql.PreparedStatement
 import kotlin.use
 

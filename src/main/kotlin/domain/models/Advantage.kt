@@ -1,4 +1,4 @@
-package org.example.domain.models
+package domain.models
 
 enum class Advantage(val message: String) {
     AD_IN("Ad-in"),

@@ -1,12 +1,12 @@
-package org.example.application.adapters
+package application.adapters
 
-import org.example.application.ports.`in`.TennisScoreResetPort
-import org.example.application.ports.out.GamePort
-import org.example.application.ports.out.PlayerPort
-import org.example.domain.dtos.GameRequest
-import org.example.domain.models.Advantage
-import org.example.domain.models.Game
-import org.example.domain.models.GameState
+import application.ports.`in`.TennisScoreResetPort
+import application.ports.out.GamePort
+import application.ports.out.PlayerPort
+import domain.dtos.GameRequest
+import domain.models.Advantage
+import domain.models.Game
+import domain.models.GameState
 
 class TennisScoreResetAdapter: TennisScoreResetPort {
     override fun resetTennisScore(

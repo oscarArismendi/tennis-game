@@ -1,16 +1,15 @@
-package org.example
 
-import org.example.application.adapters.TennisAwardPointAdapter
-import org.example.application.adapters.TennisScoreFormatAdapter
-import org.example.application.adapters.TennisScoreResetAdapter
-import org.example.application.handlers.TennisAwardPointHandler
-import org.example.application.handlers.TennisScoreFormatHandler
-import org.example.application.handlers.TennisScoreResetHandler
-import org.example.domain.dtos.GameRequest
-import org.example.domain.models.Game
-import org.example.domain.models.Player
-import org.example.infrastructure.MySQLGameRepository
-import org.example.infrastructure.MySQLPlayerRepository
+import application.adapters.TennisAwardPointAdapter
+import application.adapters.TennisScoreFormatAdapter
+import application.adapters.TennisScoreResetAdapter
+import application.handlers.TennisAwardPointHandler
+import application.handlers.TennisScoreFormatHandler
+import application.handlers.TennisScoreResetHandler
+import domain.dtos.GameRequest
+import domain.models.Game
+import domain.models.Player
+import infrastructure.MySQLGameRepository
+import infrastructure.MySQLPlayerRepository
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -42,7 +41,7 @@ fun main() {
 
     println("${federer?.lastname} is waiting")
 
-    var nadalVSDjokovicGame: Game? = mySQLGameRepository.findGameByPlayersIds(1, 2)
+    val nadalVSDjokovicGame: Game? = mySQLGameRepository.findGameByPlayersIds(1, 2)
     println("Find game with id: ${nadalVSDjokovicGame?.id} with server id: ${nadalVSDjokovicGame?.serverId} and receiver id: ${nadalVSDjokovicGame?.receiverId} \n${nadalVSDjokovicGame?.serverScore}-${nadalVSDjokovicGame?.receiverScore} the advantage is ${nadalVSDjokovicGame?.advantage?.message} and state: ${nadalVSDjokovicGame?.state?.message} ")
 
     val nadalVSDjokovicGameRequest = GameRequest("rafa.nadal@example.com", "novak.djokovic@example.com")

@@ -1,6 +1,6 @@
-package org.example.application.ports.out
+package application.ports.out
 
-import org.example.domain.models.Player
+import domain.models.Player
 
 interface PlayerPort {
     fun findPlayerByEmail(email: String): Player?

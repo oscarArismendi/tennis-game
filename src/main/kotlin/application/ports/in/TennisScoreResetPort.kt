@@ -6,5 +6,5 @@ import domain.dtos.GameRequest
 import domain.models.Game
 
 interface TennisScoreResetPort {
-    fun resetTennisScore(gameRequest: GameRequest, gameRepository: GamePort, playerRepository: PlayerPort): Game?
+    fun resetTennisScore(gameRequest: GameRequest): Game?
 }

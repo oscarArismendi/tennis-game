@@ -3,42 +3,31 @@ package application.adapters
 import application.ports.`in`.TennisAwardPointPort
 import application.ports.out.GamePort
 import application.ports.out.PlayerPort
-import application.support.ScoreLookUpError
+import utils.errors.ScoreLookUpError
 import domain.dtos.GameRequest
 import domain.models.Advantage
 import domain.models.Game
 import domain.models.GameState
+import utils.ValidationUtils
 
-class TennisAwardPointAdapter: TennisAwardPointPort {
+class TennisAwardPointAdapter(
+    val gameRepository: GamePort,
+    val playerRepository: PlayerPort
+): TennisAwardPointPort {
     override fun awardTennisPoint(
         gameRequest: GameRequest,
-        gameRepository: GamePort,
-        playerRepository: PlayerPort,
         toServer: Boolean
     ): Game? {
         try {
-            val player1 = playerRepository.findPlayerByEmail(gameRequest.serverEmail)
-            if(player1 == null){
-                throw ScoreLookUpError.PlayerNotFound(gameRequest.serverEmail)
-            }
-            val player2 = playerRepository.findPlayerByEmail(gameRequest.receiverEmail)
-            if(player2 == null){
-                throw ScoreLookUpError.PlayerNotFound(gameRequest.receiverEmail)
-            }
-            val game =gameRepository.findGameByPlayersIds(player1.id,player2.id)
-            if(game == null){
-                throw ScoreLookUpError.GameNotFound(player1.email,player2.email)
-            }
+            val player1 = ValidationUtils.findPlayerByEmailOrThrow(gameRequest.serverEmail,playerRepository)
+            val player2 = ValidationUtils.findPlayerByEmailOrThrow(gameRequest.receiverEmail,playerRepository)
+            val game = ValidationUtils.findGameByPlayersOrThrow(player1,player2,gameRepository)
 
             if(isGameEnded(game)){
                 return null
             }
 
-            if(toServer){
-                return addPointToTheServer(game,gameRepository)
-            }else{
-                return addPointToTheReceiver(game,gameRepository)
-            }
+            addPointToPlayer(game,gameRepository, toServer)
         }catch (e: ScoreLookUpError) {
             when (e) {
                 is ScoreLookUpError.PlayerNotFound -> {
@@ -87,64 +76,44 @@ class TennisAwardPointAdapter: TennisAwardPointPort {
         return game.serverScore == game.receiverScore && game.serverScore == 40 && game.advantage == Advantage.NONE && game.state != GameState.ENDED
     }
 
-    fun addPointToTheServer(game:Game, gameRepository: GamePort): Game? {
-        if (isMatchPoint(game)) {
-            if (getMatchPointPlayerId((game)) == game.serverId) {
+    fun addPointToPlayer(game:Game, gameRepository: GamePort,toServer: Boolean): Game?{
+        val playerId = if(toServer) game.serverId else game.receiverId
+        val advantageValue = if(toServer) Advantage.AD_IN else Advantage.AD_OUT
+        val advantageString = if(toServer) "AD_IN" else "AD_OUT"
+        if(isMatchPoint(game)){
+            if(getMatchPointPlayerId((game)) == playerId){
                 game.state = GameState.ENDED
                 val columnsToUpdate = "state = 'ENDED'"
-                if (gameRepository.updateGameById(columnsToUpdate, game.id)) {
-                    return game
-                }
-            }
-        }
-        if (isDeuce(game)) {
-            game.advantage = Advantage.AD_IN
-            val columnsToUpdate = "advantage = 'AD_IN'"
-            if (gameRepository.updateGameById(columnsToUpdate, game.id)) {
-                return game
-            }
-        }
-        var newScore = game.serverScore
-        when (game.serverScore) {
-            30 -> newScore = 40
-            else -> newScore += 15
-        }
-        game.serverScore = newScore
-        val columnsToUpdate = "server_score = $newScore"
-        if (gameRepository.updateGameById(columnsToUpdate, game.id)) {
-            return game
-        }
-        return null
-    }
-
-        fun addPointToTheReceiver(game:Game, gameRepository: GamePort): Game?{
-            if(isMatchPoint(game)){
-                if(getMatchPointPlayerId((game)) == game.receiverId){
-                    game.state = GameState.ENDED
-                    val columnsToUpdate = "state = 'ENDED'"
-                    if(gameRepository.updateGameById(columnsToUpdate,game.id)){
-                        return game
-                    }
-                }
-            }
-            if(isDeuce(game)){
-                game.advantage = Advantage.AD_OUT
-                val columnsToUpdate = "advantage = 'AD_OUT'"
                 if(gameRepository.updateGameById(columnsToUpdate,game.id)){
                     return game
                 }
             }
-            var newScore = game.receiverScore
-            when(game.receiverScore){
-                30 -> newScore = 40
-                else -> newScore += 15
-            }
-            game.receiverScore = newScore
-            val columnsToUpdate = "receiver_score = $newScore"
+        }
+        if(isDeuce(game)){
+            game.advantage = advantageValue
+            val columnsToUpdate = "advantage = '$advantageString'"
             if(gameRepository.updateGameById(columnsToUpdate,game.id)){
                 return game
             }
-            return null
+        }
+        var newScore = if(toServer) game.serverScore else game.receiverScore
+        when(newScore){
+            30 -> newScore = 40
+            else -> newScore += 15
+        }
+
+        if(toServer){
+            game.serverScore = newScore
+        }else{
+            game.receiverScore = newScore
+        }
+
+        val columnString = if(toServer) "server_score" else "receiver_score"
+        val columnsToUpdate = "$columnString = $newScore"
+        if(gameRepository.updateGameById(columnsToUpdate,game.id)){
+            return game
+        }
+        return null
     }
 
 

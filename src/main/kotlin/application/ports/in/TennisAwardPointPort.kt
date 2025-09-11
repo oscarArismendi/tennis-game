@@ -6,5 +6,5 @@ import domain.dtos.GameRequest
 import domain.models.Game
 
 interface TennisAwardPointPort {
-    fun awardTennisPoint(gameRequest: GameRequest, gameRepository: GamePort, playerRepository: PlayerPort, toServer: Boolean): Game?
+    fun awardTennisPoint(gameRequest: GameRequest, toServer: Boolean): Game?
 }

@@ -2,9 +2,9 @@
 import application.adapters.TennisAwardPointAdapter
 import application.adapters.TennisScoreFormatAdapter
 import application.adapters.TennisScoreResetAdapter
-import application.handlers.TennisAwardPointHandler
-import application.handlers.TennisScoreFormatHandler
-import application.handlers.TennisScoreResetHandler
+import application.ports.`in`.TennisAwardPointPort
+import application.ports.`in`.TennisScoreFormatPort
+import application.ports.`in`.TennisScoreResetPort
 import domain.dtos.GameRequest
 import domain.models.Game
 import domain.models.Player
@@ -19,14 +19,9 @@ fun main() {
     val mySQLGameRepository = MySQLGameRepository()
 
     //adapters definitions
-    val tennisScoreFormatService = TennisScoreFormatAdapter()
-    val tennisScoreResetService = TennisScoreResetAdapter()
-    val tennisAwardPointService = TennisAwardPointAdapter()
-
-    //handler definition
-    val tennisScoreFormatHandler = TennisScoreFormatHandler(tennisScoreFormatService, mySQLGameRepository, mySQLPlayerRepository)
-    val tennisScoreResetHandler = TennisScoreResetHandler(tennisScoreResetService, mySQLGameRepository, mySQLPlayerRepository )
-    val tennisAwardPointHandler = TennisAwardPointHandler(tennisAwardPointService, mySQLGameRepository, mySQLPlayerRepository)
+    val tennisScoreFormatService = TennisScoreFormatAdapter(mySQLGameRepository, mySQLPlayerRepository)
+    val tennisScoreResetService = TennisScoreResetAdapter(mySQLGameRepository, mySQLPlayerRepository)
+    val tennisAwardPointService = TennisAwardPointAdapter(mySQLGameRepository, mySQLPlayerRepository)
 
     val nadal = mySQLPlayerRepository.findPlayerByEmail("rafa.nadal@example.com")
     val djokovic = mySQLPlayerRepository.findPlayerByEmail("novak.djokovic@example.com")
@@ -45,43 +40,33 @@ fun main() {
     println("Find game with id: ${nadalVSDjokovicGame?.id} with server id: ${nadalVSDjokovicGame?.serverId} and receiver id: ${nadalVSDjokovicGame?.receiverId} \n${nadalVSDjokovicGame?.serverScore}-${nadalVSDjokovicGame?.receiverScore} the advantage is ${nadalVSDjokovicGame?.advantage?.message} and state: ${nadalVSDjokovicGame?.state?.message} ")
 
     val nadalVSDjokovicGameRequest = GameRequest("rafa.nadal@example.com", "novak.djokovic@example.com")
-    tennisScoreResetHandler.resetGame(nadalVSDjokovicGameRequest)
-    println("Score:")
-    tennisScoreFormatHandler.getFormattedScore(nadalVSDjokovicGameRequest)
+    resetGame(nadalVSDjokovicGameRequest,tennisScoreResetService,tennisScoreFormatService)
 
-    println("Score After One point to Receiver:")
-    tennisAwardPointHandler.toReceiver(nadalVSDjokovicGameRequest)
-    tennisScoreFormatHandler.getFormattedScore(nadalVSDjokovicGameRequest)
+    addPoint(nadalVSDjokovicGameRequest,tennisScoreFormatService,tennisAwardPointService,false)
+    addPoint(nadalVSDjokovicGameRequest,tennisScoreFormatService,tennisAwardPointService,false)
+    addPoint(nadalVSDjokovicGameRequest,tennisScoreFormatService,tennisAwardPointService,false)
 
-    println("Score After another point to Receiver:")
-    tennisAwardPointHandler.toReceiver(nadalVSDjokovicGameRequest)
-    tennisScoreFormatHandler.getFormattedScore(nadalVSDjokovicGameRequest)
 
-    println("Score After another point to Receiver:")
-    tennisAwardPointHandler.toReceiver(nadalVSDjokovicGameRequest)
-    tennisScoreFormatHandler.getFormattedScore(nadalVSDjokovicGameRequest)
+    addPoint(nadalVSDjokovicGameRequest,tennisScoreFormatService,tennisAwardPointService,true)
+    addPoint(nadalVSDjokovicGameRequest,tennisScoreFormatService,tennisAwardPointService,true)
+    addPoint(nadalVSDjokovicGameRequest,tennisScoreFormatService,tennisAwardPointService,true)
+    addPoint(nadalVSDjokovicGameRequest,tennisScoreFormatService,tennisAwardPointService,true)
+    addPoint(nadalVSDjokovicGameRequest,tennisScoreFormatService,tennisAwardPointService,true)
 
-    println("Score After another point to Server:")
-    tennisAwardPointHandler.toServer(nadalVSDjokovicGameRequest)
-    tennisScoreFormatHandler.getFormattedScore(nadalVSDjokovicGameRequest)
+    resetGame(nadalVSDjokovicGameRequest,tennisScoreResetService,tennisScoreFormatService)
+}
 
-    println("Score After another point to Server:")
-    tennisAwardPointHandler.toServer(nadalVSDjokovicGameRequest)
-    tennisScoreFormatHandler.getFormattedScore(nadalVSDjokovicGameRequest)
+fun addPoint(gameRequest: GameRequest, tennisScoreFormatService: TennisScoreFormatPort, tennisAwardPointService: TennisAwardPointPort,toServer: Boolean){
+    val scoringPlayer = if(toServer) "Server" else "Receiver"
+    println("Point for the $scoringPlayer:")
+    tennisAwardPointService.awardTennisPoint(gameRequest, toServer)
+    val scoreResponse = tennisScoreFormatService.getFormattedScore(gameRequest)
+    println("${scoreResponse?.formatScore}")
+}
 
-    println("Score After another point to Server:")
-    tennisAwardPointHandler.toServer(nadalVSDjokovicGameRequest)
-    tennisScoreFormatHandler.getFormattedScore(nadalVSDjokovicGameRequest)
-
-    println("Score After another point to Server:")
-    tennisAwardPointHandler.toServer(nadalVSDjokovicGameRequest)
-    tennisScoreFormatHandler.getFormattedScore(nadalVSDjokovicGameRequest)
-
-    println("Score After another point to Server:")
-    tennisAwardPointHandler.toServer(nadalVSDjokovicGameRequest)
-    tennisScoreFormatHandler.getFormattedScore(nadalVSDjokovicGameRequest)
-
-    println("Score After reset:")
-    tennisScoreResetHandler.resetGame(nadalVSDjokovicGameRequest)
-    tennisScoreFormatHandler.getFormattedScore(nadalVSDjokovicGameRequest)
+fun resetGame(gameRequest: GameRequest, tennisScoreResetService: TennisScoreResetPort,tennisScoreFormatService: TennisScoreFormatPort){
+    println("Resetting Game")
+    tennisScoreResetService.resetTennisScore(gameRequest)
+    val scoreResponse = tennisScoreFormatService.getFormattedScore(gameRequest)
+    println("${scoreResponse?.formatScore}")
 }

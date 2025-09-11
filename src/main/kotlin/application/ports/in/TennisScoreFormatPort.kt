@@ -6,5 +6,5 @@ import domain.dtos.GameRequest
 import domain.dtos.GameScoreResponse
 
 interface TennisScoreFormatPort {
-    fun getFormattedScore(gameRequest: GameRequest, gameRepository: GamePort, playerRepository: PlayerPort): GameScoreResponse?
+    fun getFormattedScore(gameRequest: GameRequest): GameScoreResponse?
 }

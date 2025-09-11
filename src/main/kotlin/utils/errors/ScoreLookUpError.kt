@@ -1,4 +1,4 @@
-package application.support
+package utils.errors
 
 sealed class ScoreLookUpError(message: String): IllegalArgumentException(message) {
     class PlayerNotFound( email: String): ScoreLookUpError("Player with email $email not found")

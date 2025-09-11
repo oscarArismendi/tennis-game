@@ -102,7 +102,7 @@ Test results will be available in the `build/reports/tests/test` directory or in
 ## Project Structure
 
 - `src/main/kotlin/` - Main source code
-  - `application/` - Application layer (adapters, handlers, ports)
+  - `application/` - Application layer (adapters and ports)
   - `domain/` - Domain models and DTOs
   - `infrastructure/` - Database repositories
   - `config/` - Configuration classes

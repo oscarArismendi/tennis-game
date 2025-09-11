@@ -3,33 +3,26 @@ package application.adapters
 import application.ports.`in`.TennisScoreFormatPort
 import application.ports.out.GamePort
 import application.ports.out.PlayerPort
-import application.support.ScoreLookUpError
+import utils.errors.ScoreLookUpError
 import domain.dtos.GameRequest
 import domain.dtos.GameScoreResponse
 import domain.models.Advantage
 import domain.models.Game
 import domain.models.GameState
 import domain.models.Player
+import utils.ValidationUtils
 
-class TennisScoreFormatAdapter: TennisScoreFormatPort {
+class TennisScoreFormatAdapter(
+                               val gameRepository: GamePort,
+                               val playerRepository: PlayerPort
+): TennisScoreFormatPort {
     override fun getFormattedScore(
-        gameRequest: GameRequest,
-        gameRepository: GamePort,
-        playerRepository: PlayerPort
+        gameRequest: GameRequest
     ): GameScoreResponse? {
         try {
-            val player1 = playerRepository.findPlayerByEmail(gameRequest.serverEmail)
-            if(player1 == null){
-                throw ScoreLookUpError.PlayerNotFound(gameRequest.serverEmail)
-            }
-            val player2 = playerRepository.findPlayerByEmail(gameRequest.receiverEmail)
-            if(player2 == null){
-                throw ScoreLookUpError.PlayerNotFound(gameRequest.receiverEmail)
-            }
-            val game =gameRepository.findGameByPlayersIds(player1.id,player2.id)
-            if(game == null){
-                throw ScoreLookUpError.GameNotFound(player1.email,player2.email)
-            }
+            val player1 = ValidationUtils.findPlayerByEmailOrThrow(gameRequest.serverEmail,playerRepository)
+            val player2 = ValidationUtils.findPlayerByEmailOrThrow(gameRequest.receiverEmail,playerRepository)
+            val game = ValidationUtils.findGameByPlayersOrThrow(player1,player2,gameRepository)
             val formattedScore = formatScore(player1,player2,game)
             return GameScoreResponse(game.serverScore, game.receiverScore,formattedScore)
         }catch (e: ScoreLookUpError) {

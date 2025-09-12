@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "2.1.21"
+    id ("com.diffplug.spotless") version "6.22.0" apply false
     application
 }
 
@@ -27,4 +28,14 @@ kotlin {
 
 application {
     mainClass.set("MainKt")
+}
+
+allprojects {
+    apply(plugin = "com.diffplug.spotless")
+    configure<com.diffplug.gradle.spotless.SpotlessExtension>{
+        kotlin {
+            target("**/*.kt")
+            ktlint("1.0.0")
+        }
+    }
 }

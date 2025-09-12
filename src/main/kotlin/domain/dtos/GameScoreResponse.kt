@@ -1,3 +1,3 @@
 package domain.dtos
 
-class GameScoreResponse(val serverScore: Int, val receiverScore: Int,val formatScore:String)
+class GameScoreResponse(val serverScore: Int, val receiverScore: Int, val formatScore: String)

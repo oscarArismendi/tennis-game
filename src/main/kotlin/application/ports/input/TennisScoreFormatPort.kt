@@ -1,7 +1,5 @@
-package application.ports.`in`
+package application.ports.input
 
-import application.ports.out.GamePort
-import application.ports.out.PlayerPort
 import domain.dtos.GameRequest
 import domain.dtos.GameScoreResponse
 

@@ -1,24 +1,22 @@
 package infrastructure
 
 import application.ports.out.PlayerPort
-import domain.models.Player
 import config.DatabaseConfig
+import domain.models.Player
 import java.sql.PreparedStatement
 import java.sql.SQLException
 
-
-class MySQLPlayerRepository: PlayerPort {
+class MySQLPlayerRepository : PlayerPort {
     override fun findPlayerByEmail(email: String): Player? {
         val sql = "CALL GetRowByColumnValue(?,?,?,?)"
         try {
-
             val dbConfig = DatabaseConfig()
             dbConfig.getConnection().use { connection ->
                 connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS).use { statement ->
-                    statement.setString(1, "id,firstname,lastname,email")// SelectColumns
-                    statement.setString(2, "player")// TableName
+                    statement.setString(1, "id,firstname,lastname,email") // SelectColumns
+                    statement.setString(2, "player") // TableName
                     statement.setString(3, "email") // ColumnName
-                    statement.setString(4, "'${email}'") // SearchValue
+                    statement.setString(4, "'$email'") // SearchValue
 
                     val resultSet = statement.executeQuery()
 
@@ -42,7 +40,6 @@ class MySQLPlayerRepository: PlayerPort {
     override fun savePlayer(player: Player): Player? {
         val sql = "INSERT INTO player (firstName,lastName,email) VALUES (?, ?, ?)"
         try {
-
             val dbConfig = DatabaseConfig()
             dbConfig.getConnection().use { connection ->
                 connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS).use { statement ->

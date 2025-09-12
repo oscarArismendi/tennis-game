@@ -7,5 +7,5 @@ class Game(
     var serverScore: Int = 0,
     var receiverScore: Int = 0,
     var advantage: Advantage,
-    var state: GameState
+    var state: GameState,
 )

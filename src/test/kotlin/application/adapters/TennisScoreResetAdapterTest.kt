@@ -1,7 +1,5 @@
 package application.adapters
 
-import io.kotest.matchers.shouldBe
-
 import application.ports.out.GamePort
 import application.ports.out.PlayerPort
 import domain.dtos.GameRequest
@@ -11,28 +9,30 @@ import domain.models.GameState
 import domain.models.Player
 import infrastructure.MySQLGameRepository
 import infrastructure.MySQLPlayerRepository
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
 class TennisScoreResetAdapterTest {
 
     val mysqlGameRepository: GamePort = MySQLGameRepository()
     val mysqlPlayerRepository: PlayerPort = MySQLPlayerRepository()
+
     // Integration test
     @Test
     fun `when the score is 40-40 and advantage is with the server,reset, go to initial state`() {
-        //Given
-        val tennisScoreResetAdapter = TennisScoreResetAdapter()
+        // Given
+        val tennisScoreResetAdapter = TennisScoreResetAdapter(mysqlGameRepository, mysqlPlayerRepository)
         val serverPlayer = Player(
             id = 1000,
             firstname = "Server",
-            lastname="Player",
-            email = "dummyServer@dummy.com"
+            lastname = "Player",
+            email = "dummyServer@dummy.com",
         )
         val receiverPlayer = Player(
-            id =10001,
+            id = 10001,
             firstname = "Receiver",
-            lastname= "Player",
-            email = "dummyPlayer@dummy.com"
+            lastname = "Player",
+            email = "dummyPlayer@dummy.com",
         )
         val currentGame = Game(
             id = 1,
@@ -41,34 +41,33 @@ class TennisScoreResetAdapterTest {
             serverScore = 40,
             receiverScore = 40,
             advantage = Advantage.AD_IN,
-            state = GameState.ENDED
+            state = GameState.ENDED,
         )
         // To force error if it does not exists
-        var player1Id: Long = 0
-        var player2Id: Long = 0
-        if(mysqlPlayerRepository.findPlayerByEmail(serverPlayer.email) == null){
+        var player1Id: Long
+        var player2Id: Long
+        if (mysqlPlayerRepository.findPlayerByEmail(serverPlayer.email) == null) {
             player1Id = mysqlPlayerRepository.savePlayer(serverPlayer)!!.id
-        }else{
+        } else {
             player1Id = mysqlPlayerRepository.findPlayerByEmail(serverPlayer.email)!!.id
         }
-        if(mysqlPlayerRepository.findPlayerByEmail(receiverPlayer.email) == null){
+        if (mysqlPlayerRepository.findPlayerByEmail(receiverPlayer.email) == null) {
             player2Id = mysqlPlayerRepository.savePlayer(receiverPlayer)!!.id
-        }else{
+        } else {
             player2Id = mysqlPlayerRepository.findPlayerByEmail(receiverPlayer.email)!!.id
         }
-        if(mysqlGameRepository.findGameByPlayersIds(player1Id,player2Id)==null){
+        if (mysqlGameRepository.findGameByPlayersIds(player1Id, player2Id) == null) {
             currentGame.serverId = player1Id
             currentGame.receiverId = player2Id
             mysqlGameRepository.saveGame(currentGame)
         }
-        val dummyGameRequest = GameRequest(serverEmail="dummyServer@dummy.com", receiverEmail="dummyPlayer@dummy.com")
-        //When
-        val result: Game? = tennisScoreResetAdapter.resetTennisScore(dummyGameRequest,mysqlGameRepository, mysqlPlayerRepository)
-        //Then
+        val dummyGameRequest = GameRequest(serverEmail = "dummyServer@dummy.com", receiverEmail = "dummyPlayer@dummy.com")
+        // When
+        val result: Game? = tennisScoreResetAdapter.resetTennisScore(dummyGameRequest)
+        // Then
         result?.serverScore shouldBe 0
         result?.receiverScore shouldBe 0
         result?.advantage shouldBe Advantage.NONE
         result?.state shouldBe GameState.NOT_STARTED
     }
-
 }

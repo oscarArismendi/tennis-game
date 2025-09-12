@@ -1,6 +1,5 @@
 package application.adapters
 
-import io.kotest.matchers.shouldBe
 import application.ports.out.GamePort
 import application.ports.out.PlayerPort
 import domain.dtos.GameRequest
@@ -9,6 +8,7 @@ import domain.models.Advantage
 import domain.models.Game
 import domain.models.GameState
 import domain.models.Player
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
 class TennisScoreFormatAdapterTest {
@@ -32,12 +32,12 @@ class TennisScoreFormatAdapterTest {
                 serverScore = 40,
                 receiverScore = 40,
                 advantage = Advantage.NONE,
-                state = GameState.IN_PROGRESS
+                state = GameState.IN_PROGRESS,
             )
         }
     }
 
-    val notStartedGameStubRepository = object : GamePort{
+    val notStartedGameStubRepository = object : GamePort {
         override fun saveGame(game: Game): Game? {
             // NOT IMPLEMENTED FOR TESTING PURPOSES
             return null
@@ -55,13 +55,13 @@ class TennisScoreFormatAdapterTest {
                 receiverId = 2,
                 serverScore = 0,
                 receiverScore = 0,
-                advantage = Advantage.NONE ,
-                state = GameState.NOT_STARTED
+                advantage = Advantage.NONE,
+                state = GameState.NOT_STARTED,
             )
         }
     }
 
-    val adInGameStubRepository = object : GamePort{
+    val adInGameStubRepository = object : GamePort {
         override fun saveGame(game: Game): Game? {
             // NOT IMPLEMENTED FOR TESTING PURPOSES
             return null
@@ -80,7 +80,7 @@ class TennisScoreFormatAdapterTest {
                 serverScore = 40,
                 receiverScore = 40,
                 advantage = Advantage.AD_IN,
-                state = GameState.IN_PROGRESS
+                state = GameState.IN_PROGRESS,
             )
         }
     }
@@ -96,7 +96,7 @@ class TennisScoreFormatAdapterTest {
             return false
         }
 
-        override fun findGameByPlayersIds(player1Id: Long, player2Id: Long): Game?{
+        override fun findGameByPlayersIds(player1Id: Long, player2Id: Long): Game? {
             return Game(
                 id = 1,
                 serverId = 1,
@@ -104,21 +104,22 @@ class TennisScoreFormatAdapterTest {
                 serverScore = 40,
                 receiverScore = 40,
                 advantage = Advantage.AD_OUT,
-                state = GameState.IN_PROGRESS
+                state = GameState.IN_PROGRESS,
             )
         }
     }
 
-    val playerStubRepository = object : PlayerPort{
+    val playerStubRepository = object : PlayerPort {
 
         override fun savePlayer(player: Player): Player? {
             // NOT IMPLEMENTED FOR TESTING PURPOSES
             return null
         }
+
         override fun findPlayerByEmail(email: String): Player? {
             return when (email) {
-                "dummyServer@dummy.com" -> Player(id = 1, firstname = "Server", lastname="Player", email = "dummyServer@dummy.com")
-                "dummyPlayer@dummy.com" -> Player(id = 2, firstname = "Receiver", lastname= "Player", email = "dummyPlayer@dummy.com")
+                "dummyServer@dummy.com" -> Player(id = 1, firstname = "Server", lastname = "Player", email = "dummyServer@dummy.com")
+                "dummyPlayer@dummy.com" -> Player(id = 2, firstname = "Receiver", lastname = "Player", email = "dummyPlayer@dummy.com")
                 else -> null
             }
         }
@@ -126,45 +127,49 @@ class TennisScoreFormatAdapterTest {
 
     @Test
     fun `when the score is 40-40 returns deuce`() {
-        //Given
-        val tennisScoreFormatAdapter = TennisScoreFormatAdapter()
-        val dummyGameRequest = GameRequest(serverEmail="dummyServer@dummy.com", receiverEmail="dummyPlayer@dummy.com")
-        //When
-        val result: GameScoreResponse? = tennisScoreFormatAdapter.getFormattedScore(dummyGameRequest,deuceGameStubRepository, playerStubRepository)
-        //Then
+        // Given
+        val tennisScoreFormatAdapter = TennisScoreFormatAdapter(deuceGameStubRepository, playerStubRepository)
+        val dummyGameRequest = GameRequest(serverEmail = "dummyServer@dummy.com", receiverEmail = "dummyPlayer@dummy.com")
+        // When
+        val result: GameScoreResponse? =
+            tennisScoreFormatAdapter.getFormattedScore(dummyGameRequest)
+        // Then
         result?.formatScore shouldBe "Deuce"
     }
 
     @Test
     fun `when the score is 0-0 returns Love-all`() {
-        //Given
-        val tennisScoreFormatAdapter = TennisScoreFormatAdapter()
-        val dummyGameRequest = GameRequest(serverEmail="dummyServer@dummy.com", receiverEmail="dummyPlayer@dummy.com")
-        //When
-        val result: GameScoreResponse? = tennisScoreFormatAdapter.getFormattedScore(dummyGameRequest,notStartedGameStubRepository, playerStubRepository)
-        //Then
+        // Given
+        val tennisScoreFormatAdapter = TennisScoreFormatAdapter(notStartedGameStubRepository, playerStubRepository)
+        val dummyGameRequest = GameRequest(serverEmail = "dummyServer@dummy.com", receiverEmail = "dummyPlayer@dummy.com")
+        // When
+        val result: GameScoreResponse? =
+            tennisScoreFormatAdapter.getFormattedScore(dummyGameRequest)
+        // Then
         result?.formatScore shouldBe "Love-all"
     }
 
     @Test
     fun `when the score is 40-40 and advantage is with the server returns 'Advantage server name'`() {
-        //Given
-        val tennisScoreFormatAdapter = TennisScoreFormatAdapter()
-        val dummyGameRequest = GameRequest(serverEmail="dummyServer@dummy.com", receiverEmail="dummyPlayer@dummy.com")
-        //When
-        val result: GameScoreResponse? = tennisScoreFormatAdapter.getFormattedScore(dummyGameRequest,adInGameStubRepository,playerStubRepository)
-        //Then
+        // Given
+        val tennisScoreFormatAdapter = TennisScoreFormatAdapter(adInGameStubRepository, playerStubRepository)
+        val dummyGameRequest = GameRequest(serverEmail = "dummyServer@dummy.com", receiverEmail = "dummyPlayer@dummy.com")
+        // When
+        val result: GameScoreResponse? =
+            tennisScoreFormatAdapter.getFormattedScore(dummyGameRequest)
+        // Then
         result?.formatScore shouldBe "Advantage Server Player"
     }
 
     @Test
     fun `when the score is 40-40 and advantage is with the receiver returns 'Advantage receiver name'`() {
-        //Given
-        val tennisScoreFormatAdapter = TennisScoreFormatAdapter()
-        val dummyGameRequest = GameRequest(serverEmail="dummyServer@dummy.com", receiverEmail="dummyPlayer@dummy.com")
-        //When
-        val result: GameScoreResponse? = tennisScoreFormatAdapter.getFormattedScore(dummyGameRequest,adOutGameStubRepository,playerStubRepository)
-        //Then
+        // Given
+        val tennisScoreFormatAdapter = TennisScoreFormatAdapter(adOutGameStubRepository, playerStubRepository)
+        val dummyGameRequest = GameRequest(serverEmail = "dummyServer@dummy.com", receiverEmail = "dummyPlayer@dummy.com")
+        // When
+        val result: GameScoreResponse? =
+            tennisScoreFormatAdapter.getFormattedScore(dummyGameRequest)
+        // Then
         result?.formatScore shouldBe "Advantage Receiver Player"
     }
 }

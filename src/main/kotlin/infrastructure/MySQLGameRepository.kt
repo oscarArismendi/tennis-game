@@ -1,18 +1,22 @@
 package infrastructure
 
 import application.ports.out.GamePort
+import config.DatabaseConfig
 import domain.models.Advantage
 import domain.models.Game
 import domain.models.GameState
-import config.DatabaseConfig
 import java.sql.PreparedStatement
 import kotlin.use
 
-class MySQLGameRepository: GamePort {
+class MySQLGameRepository : GamePort {
     override fun findGameByPlayersIds(player1Id: Long, player2Id: Long): Game? {
-        val sql = "SELECT id,server_id, receiver_id, server_score, receiver_score, advantage, state FROM game WHERE (server_id = ? AND receiver_id = ?) OR (server_id = ? AND receiver_id = ?)"
+        val sql = """
+            SELECT id,server_id, receiver_id, server_score, receiver_score, advantage, state
+            FROM game
+            WHERE (server_id = ? AND receiver_id = ?)
+                 OR (server_id = ? AND receiver_id = ?)
+        """.trimIndent()
         try {
-
             val dbConfig = DatabaseConfig()
             dbConfig.getConnection().use { connection ->
                 connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS).use { statement ->
@@ -34,13 +38,14 @@ class MySQLGameRepository: GamePort {
                         val advantageStr = resultSet.getString("advantage")
                         val stateStr = resultSet.getString("state")
 
-                        return Game(id,
+                        return Game(
+                            id,
                             serverId,
                             receiverId,
                             serverScore,
                             receiverScore,
                             Advantage.valueOf(advantageStr),
-                            GameState.valueOf(stateStr)
+                            GameState.valueOf(stateStr),
                         )
                     }
                 }
@@ -52,9 +57,17 @@ class MySQLGameRepository: GamePort {
     }
 
     override fun saveGame(game: Game): Game? {
-        val sql = "INSERT INTO game (server_id, receiver_id, server_score, receiver_score, advantage, state) VALUES (?,?,?,?,?,?)"
+        val sql = """
+            INSERT INTO game (
+                server_id, 
+                receiver_id, 
+                server_score, 
+                receiver_score, 
+                advantage, 
+                state
+            ) VALUES (?,?,?,?,?,?)
+        """.trimIndent()
         try {
-
             val dbConfig = DatabaseConfig()
             dbConfig.getConnection().use { connection ->
                 connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS).use { statement ->
@@ -85,7 +98,6 @@ class MySQLGameRepository: GamePort {
     override fun updateGameById(updateColumns: String, gameId: Long): Boolean {
         val sql = "UPDATE game SET $updateColumns WHERE id = ?"
         try {
-
             val dbConfig = DatabaseConfig()
             dbConfig.getConnection().use { connection ->
                 connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS).use { statement ->
@@ -93,7 +105,7 @@ class MySQLGameRepository: GamePort {
 
                     val rowsUpdated = statement.executeUpdate()
 
-                    if (rowsUpdated > 0){
+                    if (rowsUpdated > 0) {
                         return true
                     }
                 }
